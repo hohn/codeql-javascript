@@ -1,0 +1,86 @@
+* AST Sample for Javascript Source
+  Create dot output from query and db, and then get a rendered graph in SVG.
+
+  #+BEGIN_SRC sh
+    # 
+    export PATH=$HOME/local/vmsync/codeql250:"$PATH"
+
+    # 
+    cd ~/w/codeql-javascript/src/
+    codeql database create -j8 -v --language=javascript -s . callbacks.db
+
+    # 
+    cd ~/w/codeql-javascript/queries/
+    codeql database analyze                                 \
+           ~/w/codeql-javascript/src/callbacks.db/          \
+           ~/w/codeql-javascript/queries/printast.ql        \
+           -j8 -v --ram=16000                               \
+           --format=dot                                     \
+           --output=printast.dot
+
+    # Results in 
+    ls ./callbacks.db/results/codeql-custom-queries-javascript/printast.bqrs
+    # and
+    ls ./printast.dot/null.dot
+
+    # 
+    cd ~/w/codeql-javascript/src/
+    dot -Tsvg < ./printast.dot/null.dot > ./printast.dot/null.svg
+    open -a safari printast.dot/null.svg
+
+  #+END_SRC
+
+  #+CAPTION: Graph from dot
+  #+NAME:   fig:graph-ast-1
+  [[./src/printast.dot/null.svg]]
+
+* Correspondence between query and graph
+** Node Query
+  : query predicate nodes(PrintAstNode node, string key, string value)
+
+  query result
+  | node                     | key          | value                    |
+  |--------------------------+--------------+--------------------------|
+  | [DeclStmt] var arr = ... | semmle.label | [DeclStmt] var arr = ... |
+
+  dot source in [[./printast.dot/null.dot]]
+  #+BEGIN_SRC text
+    digraph {
+      28[label="[DeclStmt] var arr = ..."; ];
+    }
+  #+END_SRC
+
+ 
+** Edge Query
+  : query predicate edges(PrintAstNode source, PrintAstNode target, string key, string value)
+
+  query result
+  | source                      | target                                  | key          | value |
+  |-----------------------------+-----------------------------------------+--------------+-------|
+  | [DeclStmt] var result = ... | [VariableDeclarator] result ... > 3; }) | semmle.order |     1 |
+  | [DeclStmt] var result = ... | [VariableDeclarator] result ... > 3; }) | semmle.label |     1 |
+
+  dot source in [[./printast.dot/null.dot]]
+  #+BEGIN_SRC text
+    digraph {
+      29[label="[DeclStmt] var result = ..."; ];
+      9[label="[VariableDeclarator] result ... > 3; })"; ];
+
+      29 -> 9[label="1"; ];
+    }
+  #+END_SRC
+
+ 
+** graph properties
+   #+BEGIN_SRC java
+     query predicate graphProperties(string key, string value) {
+       key = "semmle.graphKind" and value = "tree"
+     }
+   #+END_SRC
+
+   query result
+   | key              | value |
+   |------------------+-------|
+   | semmle.graphKind | tree  |
+
+   dot source: none
