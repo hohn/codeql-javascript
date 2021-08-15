@@ -43,7 +43,7 @@
   |--------------------------+--------------+--------------------------|
   | [DeclStmt] var arr = ... | semmle.label | [DeclStmt] var arr = ... |
 
-  dot source in [[./printast.dot/null.dot]]
+  dot source in [[./src/printast.dot/null.dot]]
   #+BEGIN_SRC text
     digraph {
       28[label="[DeclStmt] var arr = ..."; ];
@@ -60,7 +60,7 @@
   | [DeclStmt] var result = ... | [VariableDeclarator] result ... > 3; }) | semmle.order |     1 |
   | [DeclStmt] var result = ... | [VariableDeclarator] result ... > 3; }) | semmle.label |     1 |
 
-  dot source in [[./printast.dot/null.dot]]
+  dot source in [[./src/printast.dot/null.dot]]
   #+BEGIN_SRC text
     digraph {
       29[label="[DeclStmt] var result = ..."; ];
