@@ -30,7 +30,7 @@
 
   #+END_SRC
 
-  #+CAPTION: Graph from dot
+  #+CAPTION: AST graph from dot
   #+NAME:   fig:graph-ast-1
   [[./src/printast.dot/null.svg]]
 
@@ -84,3 +84,51 @@
    | semmle.graphKind | tree  |
 
    dot source: none
+
+* Simple direct use of graph API
+  For illustration, the query [[./queries/graphout.ql]] uses the =@kind graph= output
+  for a trivial graph defined in the =edges()= predicate.
+
+  The ouput: 
+  #+CAPTION: Trivial graph rendered by dot
+  #+ATTR_HTML: :width 10% :height 180px
+  #+NAME:   fig:graph-trivial-1
+  [[./printast.dot/null.svg]]
+
+  #+BEGIN_SRC sh
+    # 
+    export PATH=$HOME/local/vmsync/codeql250:"$PATH"
+
+    # Create the db
+    cd ~/w/codeql-javascript/src/
+    rm -fR callbacks.db
+    codeql database create -j8 -v --language=javascript -s . callbacks.db
+
+    # Run the query to create dot file (and bqrs as side effect)
+    cd ~/w/codeql-javascript/
+    codeql database analyze                                 \
+           ~/w/codeql-javascript/src/callbacks.db/          \
+           ~/w/codeql-javascript/queries/graphout.ql        \
+           -j8 -v --ram=16000                               \
+           --format=dot --rerun                             \
+           --output=printast.dot
+
+    # Create SVG version of graph
+    cd ~/w/codeql-javascript/
+    dot -Tsvg < ./printast.dot/null.dot > ./printast.dot/null.svg
+    open -a safari printast.dot/null.svg
+
+    # List query result meta info
+    BQRS=src/callbacks.db/results/exploratory-queries-javascript/graphout.bqrs
+    codeql bqrs info --format=text -- $BQRS
+
+    # Format results using bqrs decode. 
+    codeql bqrs decode --output=printast.csv --result-set=edges \
+           --format=csv --entities=all -- $BQRS
+    codeql bqrs decode --output=printast.json --format=json --entities=all -- $BQRS
+
+    # Result files
+    ls -1l ./src/callbacks.db/results/exploratory-queries-javascript/graphout.bqrs  \
+       ./printast.dot/null.dot                                                      \
+       printast.csv  printast.json
+  #+END_SRC

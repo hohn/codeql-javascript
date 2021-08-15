@@ -1,0 +1,20 @@
+{"edges":{"columns":[
+   {"name":"a","kind":"Integer"}
+  ,{"name":"b","kind":"Integer"}]
+ ,"tuples":[
+   [1,2]
+  ,[2,3]]
+ },"nodes":{"columns":[
+   {"name":"n","kind":"Integer"}
+  ,{"name":"key","kind":"String"}
+  ,{"name":"val","kind":"String"}]
+ ,"tuples":[
+   [1,"semmle.label","1"]
+  ,[2,"semmle.label","2"]
+  ,[3,"semmle.label","3"]]
+ },"graphProperties":{"columns":[
+   {"name":"key","kind":"String"}
+  ,{"name":"value","kind":"String"}]
+ ,"tuples":[
+   ["semmle.graphKind","tree"]]
+ }}
